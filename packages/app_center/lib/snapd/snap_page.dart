@@ -8,6 +8,7 @@ import 'package:app_center/layout.dart';
 import 'package:app_center/manage/local_snap_providers.dart';
 import 'package:app_center/manage/quit_to_update_notice.dart';
 import 'package:app_center/ratings/ratings.dart';
+import 'package:app_center/ratings/ratings_data.dart';
 import 'package:app_center/snapd/snap_report.dart';
 import 'package:app_center/snapd/snapd.dart';
 import 'package:app_center/snapd/snapd_cache.dart';
@@ -113,6 +114,7 @@ class _ActionBar extends ConsumerWidget {
         ? null
         : ref.watch(launchProvider(snapData.localSnap!));
     final primaryAction = snapData.primaryAction(snapLauncher);
+    final ratingsModel = ref.watch(ratingsModelProvider(snapData.name));
 
     return Wrap(
       runSpacing: kSpacing,
@@ -124,9 +126,15 @@ class _ActionBar extends ConsumerWidget {
             snapName: snapData.name,
             isPrimary: true,
           ),
-        if (snapData.isInstalled) ...[
-          _RatingsActionButtons(snap: snapData.snap),
-        ],
+        if (snapData.isInstalled)
+          ...[
+            ratingsModel.whenOrNull(
+              data: (ratingsData) => _RatingsActionButtons(
+                ratingsData: ratingsData,
+                snap: snapData.snap,
+              ),
+            ),
+          ].nonNulls,
         _MoreActionsButton(snapData: snapData),
       ],
     );
@@ -316,97 +324,91 @@ class _SwitchChannelButton extends ConsumerWidget {
 }
 
 class _RatingsActionButtons extends ConsumerWidget {
-  const _RatingsActionButtons({required this.snap});
+  const _RatingsActionButtons({required this.ratingsData, required this.snap});
 
+  final RatingsData ratingsData;
   final Snap snap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ratingsModel = ref.watch(ratingsModelProvider(snap.name));
     final ratingsNotifier = ref.watch(ratingsModelProvider(snap.name).notifier);
 
-    return ratingsModel.when(
-      data: (ratingsData) {
-        return IntrinsicHeight(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(6),
+              bottomLeft: Radius.circular(6),
+            ),
+            onTap: () {
+              ratingsNotifier.castVote(VoteStatus.up);
+            },
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Theme.of(context).dividerColor),
+                  bottom: BorderSide(color: Theme.of(context).dividerColor),
+                  left: BorderSide(color: Theme.of(context).dividerColor),
+                  right: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                ),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(6),
                   bottomLeft: Radius.circular(6),
                 ),
-                onTap: () {
-                  ratingsNotifier.castVote(VoteStatus.up);
-                },
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Theme.of(context).dividerColor),
-                      bottom: BorderSide(color: Theme.of(context).dividerColor),
-                      left: BorderSide(color: Theme.of(context).dividerColor),
-                      right: BorderSide(
-                        color: Theme.of(context).dividerColor,
-                        width: 0.5,
-                      ),
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(6),
-                      bottomLeft: Radius.circular(6),
-                    ),
-                  ),
-                  child: YaruIconButton(
-                    mouseCursor: SystemMouseCursors.click,
-                    icon: Icon(
-                      ratingsData.voteStatus == VoteStatus.up
-                          ? Icons.thumb_up
-                          : Icons.thumb_up_outlined,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                  ),
+              ),
+              child: YaruIconButton(
+                mouseCursor: SystemMouseCursors.click,
+                icon: Icon(
+                  ratingsData.voteStatus == VoteStatus.up
+                      ? Icons.thumb_up
+                      : Icons.thumb_up_outlined,
+                  color: Theme.of(context).iconTheme.color,
                 ),
               ),
-              InkWell(
+            ),
+          ),
+          InkWell(
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(6),
+              bottomRight: Radius.circular(6),
+            ),
+            onTap: () {
+              ratingsNotifier.castVote(VoteStatus.down);
+            },
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Theme.of(context).dividerColor),
+                  bottom: BorderSide(color: Theme.of(context).dividerColor),
+                  left: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                  right: BorderSide(color: Theme.of(context).dividerColor),
+                ),
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(6),
                   bottomRight: Radius.circular(6),
                 ),
-                onTap: () {
-                  ratingsNotifier.castVote(VoteStatus.down);
-                },
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Theme.of(context).dividerColor),
-                      bottom: BorderSide(color: Theme.of(context).dividerColor),
-                      left: BorderSide(
-                        color: Theme.of(context).dividerColor,
-                        width: 0.5,
-                      ),
-                      right: BorderSide(color: Theme.of(context).dividerColor),
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(6),
-                      bottomRight: Radius.circular(6),
-                    ),
-                  ),
-                  child: YaruIconButton(
-                    mouseCursor: SystemMouseCursors.click,
-                    icon: Icon(
-                      ratingsData.voteStatus == VoteStatus.down
-                          ? Icons.thumb_down
-                          : Icons.thumb_down_outlined,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                  ),
+              ),
+              child: YaruIconButton(
+                mouseCursor: SystemMouseCursors.click,
+                icon: Icon(
+                  ratingsData.voteStatus == VoteStatus.down
+                      ? Icons.thumb_down
+                      : Icons.thumb_down_outlined,
+                  color: Theme.of(context).iconTheme.color,
                 ),
               ),
-            ],
+            ),
           ),
-        );
-      },
-      error: (error, stackTrace) => const SizedBox.shrink(),
-      loading: () => const SizedBox.shrink(),
+        ],
+      ),
     );
   }
 }
@@ -478,10 +480,11 @@ class _ChannelSwitchDialog extends ConsumerWidget {
         contentPadding: const EdgeInsets.all(20),
         titlePadding: EdgeInsets.zero,
         title: YaruDialogTitleBar(
-            title: snap.whenOrNull(
-          data: (snapData) =>
-              Text(l10n.snapActionSwitchChannelTitle(snapData.name)),
-        )),
+          title: snap.whenOrNull(
+            data: (snapData) =>
+                Text(l10n.snapActionSwitchChannelTitle(snapData.name)),
+          ),
+        ),
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
