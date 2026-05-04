@@ -93,9 +93,10 @@ Future<void> testInstallSnap(
 
   await tester.tap(installButton);
   await tester.pumpUntil(
-    find.descendant(
-      of: find.byType(YaruPopupMenuButton),
-      matching: find.byIcon(YaruIcons.view_more),
+    find.byWidgetPredicate(
+      (_) =>
+          installButton.evaluate().isEmpty &&
+          find.button(tester.l10n.snapActionCancelLabel).evaluate().isEmpty,
     ),
   );
 
