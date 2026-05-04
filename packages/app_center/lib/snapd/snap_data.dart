@@ -94,6 +94,8 @@ class SnapData extends AppMetadata with _$SnapData {
     return [
       if (canOpen) SnapAction.open,
       if (!shouldQuitToUpdate && hasUpdate) SnapAction.update,
+      if (availableChannels != null && selectedChannel != null)
+        SnapAction.switchChannel,
       if (canRevert) SnapAction.revert,
       if (isInstalled) SnapAction.remove,
     ];

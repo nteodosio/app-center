@@ -124,11 +124,6 @@ class _ActionBar extends ConsumerWidget {
             snapName: snapData.name,
             isPrimary: true,
           ),
-        if (snapData.availableChannels != null &&
-            snapData.selectedChannel != null) ...[
-          _ChannelDropdown(snapData: snapData),
-          _SwitchChannelButton(snapData: snapData),
-        ],
         if (snapData.isInstalled) ...[
           _RatingsActionButtons(snap: snapData.snap),
         ],
@@ -235,12 +230,19 @@ class _MoreActionsButton extends ConsumerWidget {
                     ? Theme.of(context).colorScheme.error
                     : null;
                 return PopupMenuItem(
-                  onTap: action.callback(
-                    snapData,
-                    snapViewModel,
-                    snapLauncher,
-                    context,
-                  ),
+                  onTap: action == SnapAction.switchChannel
+                      ? () => showDialog(
+                            context: context,
+                            builder: (context) => _ChannelSwitchDialog(
+                              snapName: snapData.snap.name,
+                            ),
+                          )
+                      : action.callback(
+                          snapData,
+                          snapViewModel,
+                          snapLauncher,
+                          context,
+                        ),
                   child: IntrinsicWidth(
                     child: ListTile(
                       mouseCursor: SystemMouseCursors.click,
@@ -289,7 +291,24 @@ class _SwitchChannelButton extends ConsumerWidget {
                   context,
                 )
               : null,
-          child: Text(l10n.snapActionSwitchChannelLabel),
+          child: Stack(
+            alignment: AlignmentGeometry.center,
+            children: [
+              Visibility(
+                maintainSize: true,
+                maintainSemantics: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: snapData.activeChangeId == null,
+                child: Text(l10n.snapActionSwitchChannelLabel),
+              ),
+              if (snapData.activeChangeId != null)
+                const SizedBox.square(
+                  dimension: kLoaderHeight,
+                  child: YaruCircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
         ),
       ],
     );
@@ -444,6 +463,48 @@ class _IconRow extends ConsumerWidget {
   }
 }
 
+class _ChannelSwitchDialog extends ConsumerWidget {
+  const _ChannelSwitchDialog({required this.snapName});
+
+  final String snapName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final snap = ref.watch(snapModelProvider(snapName));
+    final l10n = AppLocalizations.of(context);
+
+    return ResponsiveLayoutBuilder(
+      builder: (context) => SimpleDialog(
+        contentPadding: const EdgeInsets.all(20),
+        titlePadding: EdgeInsets.zero,
+        title: YaruDialogTitleBar(
+            title: snap.whenOrNull(
+          data: (snapData) =>
+              Text(l10n.snapActionSwitchChannelTitle(snapData.name)),
+        )),
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: snap.whenOrNull(
+                  data: (snapData) => [
+                    _ChannelDropdown(snapData: snapData),
+                    const SizedBox(height: kPagePadding),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _SwitchChannelButton(snapData: snapData),
+                      ],
+                    ),
+                  ],
+                ) ??
+                [],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ChannelDropdown extends ConsumerWidget {
   const _ChannelDropdown({required this.snapData});
 
@@ -454,14 +515,15 @@ class _ChannelDropdown extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final channelText =
         '${snapData.selectedChannel} ${snapData.availableChannels![snapData.selectedChannel]!.version}';
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           l10n.snapPageChannelLabel,
           style: Theme.of(context).textTheme.labelLarge,
         ),
-        const SizedBox(width: kSpacingSmall),
+        const SizedBox(height: kSpacingSmall),
         SizedBox(
           width: _kChannelDropdownWidth,
           child: MenuButtonBuilder(
