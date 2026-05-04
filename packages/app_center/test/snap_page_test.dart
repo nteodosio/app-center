@@ -395,6 +395,38 @@ void main() {
     expect(revertButton, findsOneWidget);
   });
 
+  testWidgets('switch channel appears in dropdown', (tester) async {
+    registerMockSnapdService(
+      storeSnap: storeSnap,
+    );
+    final container = createContainer(
+      overrides: [
+        launchProvider.overrideWith((ref, arg) => createMockSnapLauncher()),
+      ],
+    );
+
+    await tester.pumpApp(
+      (_) => UncontrolledProviderScope(
+        container: container,
+        child: SnapPage(snapName: storeSnap.name),
+      ),
+    );
+    await container.read(snapModelProvider(storeSnap.name).future);
+    await tester.pumpAndSettle();
+
+    final viewMoreButton = find.descendant(
+      of: find.byType(YaruPopupMenuButton),
+      matching: find.byIcon(YaruIcons.view_more),
+    );
+    expect(viewMoreButton, findsOneWidget);
+    await tester.tap(viewMoreButton);
+    await tester.pumpAndSettle();
+
+    final switchChannelButton =
+        find.text(tester.l10n.snapActionSwitchChannelLabel);
+    expect(switchChannelButton, findsOneWidget);
+  });
+
   testWidgets('loading', (tester) async {
     registerMockSnapdService(localSnap: localSnap, storeSnap: storeSnap);
     final snapLauncher = createMockSnapLauncher(isLaunchable: true);
