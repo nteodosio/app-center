@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:app_center/apps/apps_utils.dart';
 import 'package:appstream/appstream.dart';
 import 'package:collection/collection.dart';
+import 'package:gtk/gtk.dart';
 
 extension _GetOrDefault<K, V> on Map<K, V> {
   V getOrDefault(K? key, V fallback) {
@@ -94,9 +94,9 @@ extension Metadata on AppstreamComponent {
 
   /// Resolves the local themed icon path, falling back to [remoteIconUrl].
   Future<String?> get iconAsync async {
-    final stockName = iconName;
-    if (stockName != null) {
-      final localPath = await lookupThemedIcon(stockName);
+    if (iconName != null) {
+      final iconTheme = GtkIcon();
+      final localPath = iconTheme.findIcon(iconName!);
       if (localPath != null) return localPath;
     }
     return remoteIconUrl;
