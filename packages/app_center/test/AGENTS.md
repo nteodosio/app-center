@@ -19,7 +19,7 @@ fvm flutter test --name "test name"       # By name
 
 ## Data Builders
 
-@test_utils.dart provides `create*()` factory functions (e.g. for snaps, appstream components, debs) and pre-built constants for common test fixtures. Check the file for available builders.
+@test_utils.dart provides `create*()` factory functions (e.g. for snaps, appstream components, debs) and pre-built constants for common test fixtures. Check the file for available builders, add new ones as needed.
 
 ## Mocks
 
