@@ -220,9 +220,13 @@ class _BannerIconState extends State<_BannerIcon> {
                     ),
                   ],
                 ),
-                child: AppIcon(
-                  iconUrl: widget.snap.iconUrl,
-                  size: widget.iconSize.height * scale,
+                child: Semantics(
+                  label: widget.snap.titleOrName,
+                  button: true,
+                  child: AppIcon(
+                    iconUrl: widget.snap.iconUrl,
+                    size: widget.iconSize.height * scale,
+                  ),
                 ),
               ),
             ),
