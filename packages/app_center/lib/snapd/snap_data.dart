@@ -99,7 +99,7 @@ class SnapData extends AppMetadata with _$SnapData {
           selectedChannel != null)
         SnapAction.switchChannel,
       if (canRevert) SnapAction.revert,
-      if (isInstalled) SnapAction.remove,
+
     ];
   }
 

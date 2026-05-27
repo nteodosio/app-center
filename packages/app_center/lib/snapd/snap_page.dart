@@ -124,6 +124,7 @@ class _ActionBar extends ConsumerWidget {
           ),
         if (snapData.isInstalled)
           ...[
+            _UninstallButton(snapData: snapData),
             ratingsModel.whenOrNull(
               data: (ratingsData) => _RatingsActionButtons(
                 ratingsData: ratingsData,
@@ -205,6 +206,25 @@ class _PrimaryActionButton extends ConsumerWidget {
   }
 }
 
+class _UninstallButton extends ConsumerWidget {
+  const _UninstallButton({required this.snapData});
+
+  final SnapData snapData;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final snapViewModel = ref.watch(snapModelProvider(snapData.name).notifier);
+
+    return OutlinedButton(
+      onPressed: snapData.activeChangeId == null
+          ? SnapAction.remove.callback(snapData, snapViewModel, null, context)
+          : null,
+      child: Text(SnapAction.remove.label(l10n)),
+    );
+  }
+}
+
 class _MoreActionsButton extends ConsumerWidget {
   const _MoreActionsButton({required this.snapData});
 
@@ -255,7 +275,7 @@ class _MoreActionsButton extends ConsumerWidget {
             onSelected: (value) => {},
             child: Icon(YaruIcons.view_more),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }
 
