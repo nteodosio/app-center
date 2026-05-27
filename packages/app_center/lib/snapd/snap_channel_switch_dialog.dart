@@ -9,7 +9,7 @@ import 'package:snapd/snapd.dart';
 import 'package:ubuntu_widgets/ubuntu_widgets.dart';
 import 'package:yaru/yaru.dart';
 
-const _kChannelDropdownWidth = 220.0;
+const _kChannelDropdownWidth = 350.0;
 
 class ChannelSwitchDialog extends ConsumerWidget {
   const ChannelSwitchDialog({required this.snapName, super.key});
