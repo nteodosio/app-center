@@ -59,6 +59,7 @@ class SnapData extends AppMetadata with _$SnapData {
   static String? defaultSelectedChannel(Snap? localSnap, Snap? storeSnap) {
     final channels = storeSnap?.channels.keys;
     final localChannel = localSnap?.trackingChannel;
+
     if (localChannel != null && (channels?.contains(localChannel) ?? false)) {
       return localChannel;
     } else if (channels?.contains('latest/stable') ?? false) {
@@ -99,7 +100,6 @@ class SnapData extends AppMetadata with _$SnapData {
           selectedChannel != null)
         SnapAction.switchChannel,
       if (canRevert) SnapAction.revert,
-
     ];
   }
 
