@@ -169,8 +169,6 @@ void main() {
       matching: find.byIcon(YaruIcons.view_more),
     );
     expect(viewMoreButton, findsOneWidget);
-    await tester.tap(viewMoreButton);
-    await tester.pumpAndSettle();
 
     final removeButton = find.text(tester.l10n.snapActionRemoveLabel);
     expect(removeButton, findsOneWidget);
@@ -234,16 +232,14 @@ void main() {
       ),
     ).called(1);
 
+    final openButton = find.text(tester.l10n.snapActionOpenLabel);
+    expect(openButton, findsNothing);
+
     final viewMoreButton = find.descendant(
       of: find.byType(YaruPopupMenuButton),
       matching: find.byIcon(YaruIcons.view_more),
     );
     expect(viewMoreButton, findsOneWidget);
-    await tester.tap(viewMoreButton);
-    await tester.pumpAndSettle();
-
-    final openButton = find.text(tester.l10n.snapActionOpenLabel);
-    expect(openButton, findsOneWidget);
 
     await tester.tap(find.text(tester.l10n.snapActionRemoveLabel));
     await tester.pumpAndSettle();
@@ -335,11 +331,6 @@ void main() {
     await tester.tap(find.text(tester.l10n.snapActionOpenLabel));
     verify(snapLauncher.open()).called(1);
     await tester.pump();
-
-    final findMoreButton = find.byIcon(YaruIcons.view_more);
-    expect(findMoreButton, findsOneWidget);
-    await tester.tap(findMoreButton);
-    await tester.pumpAndSettle();
 
     final removeButton = find.text(tester.l10n.snapActionRemoveLabel);
     expect(removeButton, findsOneWidget);
