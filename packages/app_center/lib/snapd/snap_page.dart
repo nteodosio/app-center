@@ -292,12 +292,15 @@ class _SwitchChannelButton extends ConsumerWidget {
       children: [
         YaruSplitButton.outlined(
           onPressed: hasChangedChannel && snapData.activeChangeId == null
-              ? SnapAction.switchChannel.callback(
-                  snapData,
-                  snapViewModel,
-                  snapLauncher,
-                  context,
-                )
+              ? () {
+                  SnapAction.switchChannel.callback(
+                    snapData,
+                    snapViewModel,
+                    snapLauncher,
+                    context,
+                  )?.call();
+                  Navigator.of(context).pop();
+                }
               : null,
           child: Stack(
             alignment: AlignmentGeometry.center,
