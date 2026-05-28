@@ -107,8 +107,16 @@ class SnapData extends AppMetadata with _$SnapData {
   String? get publisher => snap.publisher?.displayName;
 
   @override
-  String? get version =>
-      isInstalled ? localSnap!.version : (channelInfo?.version ?? snap.version);
+  String? get version {
+    final rawVersion = isInstalled
+        ? localSnap!.version
+        : (channelInfo?.version ?? snap.version);
+    final trackingChannel = localSnap?.trackingChannel;
+    if (trackingChannel != null && trackingChannel != 'latest/stable') {
+      return '$trackingChannel $rawVersion';
+    }
+    return rawVersion;
+  }
 
   @override
   DateTime? get published => channelInfo?.releasedAt;
