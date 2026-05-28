@@ -7,8 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ubuntu_service/ubuntu_service.dart';
 import 'package:ubuntu_test/ubuntu_test.dart';
-import 'package:yaru/icons.dart';
-import 'package:yaru/widgets.dart';
 import 'package:yaru_test/yaru_test.dart';
 
 import '../test/test_utils.dart';
@@ -112,13 +110,7 @@ Future<void> testRemoveSnap(
 }) async {
   final installButton = find.button(tester.l10n.snapActionInstallLabel);
   expect(installButton, findsNothing);
-  final menuButton = find.descendant(
-    of: find.byType(YaruPopupMenuButton),
-    matching: find.byIcon(YaruIcons.view_more),
-  );
 
-  await tester.tap(menuButton);
-  await tester.pumpAndSettle();
   await tester.tap(find.text(tester.l10n.snapActionRemoveLabel));
   await tester.pumpUntil(installButton);
 
