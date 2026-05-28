@@ -138,8 +138,9 @@ class SnapData extends AppMetadata with _$SnapData {
   int? get downloadSize => activeChannelInfo?.size;
 
   @override
-  AppConfinement? get confinement =>
-      AppConfinement.fromSnap(activeChannelInfo?.confinement ?? snap.confinement);
+  AppConfinement? get confinement => AppConfinement.fromSnap(
+        activeChannelInfo?.confinement ?? snap.confinement,
+      );
 
   @override
   Map<AppLink, String>? get links => {
